@@ -32,51 +32,50 @@ async function loadStatusFromSheet(){
   const tbody = table.querySelector('tbody');
   const info = document.getElementById('status-info');
 
-  // TODO: ใส่ค่า Sheet จริง
+  // ใส่ค่าจริงของคุณ
   const SHEET_ID = '2PACX-1vQh-7Ysrk4FdoKqSWKNgQ-S9cBRGDN47crK51I9LGmjJf0dW6R00BU6P3IsKA2fuCVLP16qLxwMJZgj';
-  const GID = '2051869754';
-  // ใช้ publish as CSV
-  const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+  const GID = '592123917'; // <— ใช้ gid ของแท็บที่ publish จริง
+
+  // ใช้ URL ให้ตรงชนิดของ ID
+  const csvUrl = SHEET_ID.startsWith('2PACX-')
+    ? `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=${GID}&single=true&output=csv`
+    : `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
   try{
     const res = await fetch(csvUrl, { cache: 'no-store' });
-    if(!res.ok) throw new Error('fetch failed');
+    if(!res.ok) throw new Error(`fetch failed: ${res.status}`);
     const csv = await res.text();
     const rows = parseCSV(csv);
 
-    // คาดหวัง header:
+    // header ที่คาดหวัง:
     // application_id, name, course, paid, status, updated_at
     const header = rows.shift().map(h=>h.trim().toLowerCase());
-    const idx = {
-      id: header.indexOf('application_id'),
-      name: header.indexOf('name'),
-      course: header.indexOf('course'),
-      paid: header.indexOf('paid'),
-      status: header.indexOf('status'),
-      updated: header.indexOf('updated_at'),
-    };
+    const need = ["application_id","name","course","paid","status","updated_at"];
+    const ok = need.every((k,i)=> (header[i]||"") === k);
+    if(!ok) throw new Error(`bad header: got [${header.join(", ")}]`);
 
     tbody.innerHTML = '';
-    rows.forEach(r=>{
-      if(!r.length || !r[idx.id]) return;
+    for(const r of rows){
+      if(!r.length || !r[0]) continue; // ต้องมี application_id
+      const [id,name,course,paid,status,updated] = r;
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><code>${escapeHtml(r[idx.id])}</code></td>
-        <td>${escapeHtml(r[idx.name]||'')}</td>
-        <td>${escapeHtml(r[idx.course]||'')}</td>
-        <td>${escapeHtml(r[idx.paid]||'')}</td>
-        <td>${statusPill((r[idx.status]||'').toLowerCase())}</td>
-        <td>${escapeHtml(r[idx.updated]||'')}</td>
+        <td><code>${escapeHtml(id)}</code></td>
+        <td>${escapeHtml(name||'')}</td>
+        <td>${escapeHtml(course||'')}</td>
+        <td>${escapeHtml(paid||'')}</td>
+        <td>${statusPill(String(status||'').toLowerCase())}</td>
+        <td class="mono">${escapeHtml(updated||'')}</td>
       `;
       tbody.appendChild(tr);
-    });
-
+    }
     info.textContent = 'อัปเดตอัตโนมัติจาก Google Sheet (อ่านอย่างเดียว)';
   }catch(err){
-    console.error(err);
+    console.error('Load status failed', err, csvUrl);
     info.textContent = 'โหลดสถานะไม่สำเร็จ: ตรวจสอบ Publish to the web และค่า SHEET_ID/GID';
   }
 }
+
 
 function statusPill(s){
   if(s.includes('approved')||s.includes('confirmed')||s.includes('paid')) return `<span class="status-pill ok">✔ ยืนยันแล้ว</span>`;
