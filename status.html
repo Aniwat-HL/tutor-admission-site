@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สถานะการสมัคร | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html" class="active">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>สถานะการสมัคร</h1>
+      <p class="muted">ระบบนี้อ่านข้อมูลจาก <strong>Google Sheet</strong> (โหมดสาธารณะ ดูอย่างเดียว) — กรอก Sheet แล้วกดรีเฟรชหน้านี้เพื่ออัปเดต</p>
+      <div class="card" style="padding:1rem;overflow:auto">
+        <table id="status-table">
+          <thead>
+            <tr>
+              <th>Application ID</th>
+              <th>ชื่อ</th>
+              <th>คอร์ส</th>
+              <th>การชำระเงิน</th>
+              <th>สถานะ</th>
+              <th>อัปเดตล่าสุด</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" style="color:var(--muted)">กำลังโหลด…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="status-info" class="muted" style="margin-top:.6rem">กำลังโหลด…</p>
+
+      <details style="margin-top:1rem" class="card">
+        <summary style="padding:1rem;cursor:pointer;font-weight:700">วิธีตั้งค่า Google Sheet (ครั้งแรก)</summary>
+        <div style="padding:1rem;line-height:1.8;color:#cbd5e1">
+          <ol>
+            <li>สร้าง Google Sheet หัวคอลัมน์: <code>application_id, name, course, paid, status, updated_at</code></li>
+            <li>ไปที่ <b>File → Share → Publish to the web</b> เลือกชีตที่ต้องการ แล้วกด Publish</li>
+            <li>คัดลอก <code>Sheet ID</code> (อยู่ใน URL หลัง <code>/d/</code>) และ <code>gid</code> ของชีตนั้น</li>
+            <li>เปิดไฟล์ <code>assets/app.js</code> แล้วแทนค่า <code>SHEET_ID</code> และ <code>GID</code></li>
+            <li>Commit & Push ไปที่ GitHub Pages จากนั้นรีเฟรชหน้านี้</li>
+          </ol>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
