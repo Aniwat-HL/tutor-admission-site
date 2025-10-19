@@ -1,78 +1,329 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>สมัครเรียนเสริม | ตัวอย่างเว็บไซต์ฟรี</title>
-  <style>
-    body {font-family: sans-serif; margin:0; background:#f5f5f5; color:#333;}
-    header {background:#0078d7; color:white; padding:1rem; text-align:center;}
-    nav {background:#004a94; display:flex; justify-content:center;}
-    nav a {color:white; padding:1rem; text-decoration:none;}
-    nav a:hover {background:#0066cc;}
-    section {padding:2rem; max-width:900px; margin:auto; background:white; margin-top:1rem; border-radius:8px;}
-    h1,h2{text-align:center;}
-    .course {border:1px solid #ddd; padding:1rem; border-radius:8px; margin:0.5rem 0;}
-    footer {text-align:center; padding:1rem; background:#004a94; color:white; margin-top:2rem;}
-    .btn {display:inline-block; padding:0.5rem 1rem; background:#0078d7; color:white; border-radius:4px; text-decoration:none;}
-    .btn:hover {background:#005fa3;}
-    iframe {width:100%; height:600px; border:none;}
-  </style>
-</head>
-<body>
-  <header>
-    <h1>สถาบันเรียนเสริม Demo</h1>
-    <p>เว็บไซต์ตัวอย่างสำหรับเปิดรับสมัครนักเรียน (ฟรี ไม่ต้องใช้โฮสติ้ง)</p>
-  </header>
+import React, { useMemo, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, CreditCard, Home, FileText, Phone, GraduationCap, ChevronRight, Menu, X } from "lucide-react";
 
-  <nav>
-    <a href="#courses">คอร์สเรียน</a>
-    <a href="#apply">สมัครเรียน</a>
-    <a href="#payment">ชำระเงิน</a>
-    <a href="#contact">ติดต่อ</a>
-  </nav>
+// ✅ Single-file React SPA that works in ChatGPT canvas preview
+// - Tailwind CSS for styling (auto-available in this environment)
+// - Framer Motion for page transitions & micro-interactions
+// - Minimal client-side router using useState (no external router needed)
+// - Easy to export to Vite/CRA and deploy on GitHub Pages
 
-  <section id="courses">
-    <h2>คอร์สเรียนยอดนิยม</h2>
-    <div class="course">
-      <h3>คณิตศาสตร์พื้นฐาน</h3>
-      <p>เรียนรู้หลักการและแบบฝึกหัดเพื่อเสริมความเข้าใจในวิชาคณิตศาสตร์</p>
-      <p><strong>ราคา:</strong> 2,990 บาท</p>
+const NAV = [
+  { key: "home", label: "หน้าหลัก", icon: Home },
+  { key: "courses", label: "คอร์สเรียน", icon: BookOpen },
+  { key: "apply", label: "สมัครเรียน", icon: FileText },
+  { key: "payment", label: "ชำระเงิน", icon: CreditCard },
+  { key: "faq", label: "FAQ", icon: GraduationCap },
+  { key: "contact", label: "ติดต่อ", icon: Phone },
+];
+
+const pageVariants = {
+  initial: { opacity: 0, y: 12, filter: "blur(4px)" },
+  enter: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.35 } },
+  exit: { opacity: 0, y: -12, filter: "blur(4px)", transition: { duration: 0.25 } },
+};
+
+const Card = ({ className = "", children }) => (
+  <div className={`rounded-2xl border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-slate-950/30 ${className}`}>{children}</div>
+);
+
+const Section = ({ title, children, className = "" }) => (
+  <section className={`mx-auto w-full max-w-6xl px-4 ${className}`}>
+    {title && <h2 className="mb-4 text-xl font-semibold text-slate-200">{title}</h2>}
+    {children}
+  </section>
+);
+
+const Badge = ({ children }) => (
+  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-400/10 px-3 py-1 text-sm text-emerald-300">
+    {children}
+  </span>
+);
+
+function Hero({ goApply, goCourses }) {
+  return (
+    <div className="relative overflow-clip">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_50%_40%,rgba(34,197,94,.20),rgba(2,6,23,0))]" />
+      <Section className="pt-12 pb-10">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <Badge>เปิดรับสมัครรุ่นใหม่ – ที่นั่งจำกัด</Badge>
+            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-slate-50 md:text-5xl">
+              ยกระดับผลการเรียน ด้วยคอร์สเสริมที่ออกแบบมาเพื่อคุณ
+            </h1>
+            <p className="mt-3 max-w-prose text-slate-300">
+              คณิต วิทย์ อังกฤษ และทักษะดิจิทัล สอนสด/ออนไลน์ กลุ่มเล็ก เหมาะสำหรับ ม.ต้น–ม.ปลาย พร้อมระบบสมัครออนไลน์และชำระเงินได้ทันที
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button onClick={goApply} className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-emerald-950 transition hover:bg-emerald-400">
+                สมัครเรียนทันที
+              </button>
+              <button onClick={goCourses} className="rounded-xl border border-slate-700 bg-slate-900 px-5 py-3 font-semibold text-slate-200 transition hover:bg-slate-800">
+                ดูคอร์สทั้งหมด
+              </button>
+            </div>
+            <p className="mt-3 text-sm text-slate-400">* เว็บไซต์สาธิต: ฟรี, โฮสต์บน GitHub Pages ได้</p>
+          </div>
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Card className="p-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                  { t: "คณิตเข้ม ม.ต้น", h: "12 ครั้ง", p: "฿2,990" },
+                  { t: "Physics Crash ม.ปลาย", h: "8 ครั้ง", p: "฿2,490" },
+                  { t: "English for Uni", h: "10 ครั้ง", p: "฿3,200" },
+                ].map((c, i) => (
+                  <motion.div key={i} whileHover={{ y: -3 }} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+                    <div className="text-slate-200">{c.t}</div>
+                    <div className="text-sm text-slate-400">{c.h}</div>
+                    <div className="mt-2 font-bold text-emerald-300">{c.p}</div>
+                    <button onClick={goApply} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">
+                      สมัครคอร์สนี้ <ChevronRight size={16} />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </Section>
     </div>
-    <div class="course">
-      <h3>ฟิสิกส์สรุปเข้ม</h3>
-      <p>สรุปสูตรสำคัญและเทคนิคการทำข้อสอบ</p>
-      <p><strong>ราคา:</strong> 2,490 บาท</p>
+  );
+}
+
+function Courses({ goApply }) {
+  const courses = useMemo(
+    () => [
+      { id: "m1", title: "คณิตศาสตร์พื้นฐาน (ม.1–ม.3)", desc: "ทบทวนหลักการ + ตะลุยโจทย์ แบ่งระดับความยากเป็น Step", price: 2990 },
+      { id: "p6", title: "ฟิสิกส์สรุปเข้ม (ม.4–ม.6)", desc: "สรุปสูตรสำคัญ + เทคนิคทำข้อสอบ เข้าใจง่าย พร้อมชีท", price: 2490 },
+      { id: "eU", title: "English for University", desc: "Grammar, Writing, Speaking สำหรับเตรียมเข้ามหาลัย", price: 3200 },
+      { id: "ds1", title: "Digital Skills – AI & Data", desc: "พื้นฐานข้อมูล/AI สำหรับนักเรียนยุคใหม่ (โครงงาน)", price: 3500 },
+    ],
+    []
+  );
+  return (
+    <Section title="คอร์สเรียน">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {courses.map((c, idx) => (
+          <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+            <Card className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-100">{c.title}</h3>
+                  <p className="mt-1 text-sm text-slate-400">{c.desc}</p>
+                </div>
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-400/10 px-3 py-1 font-bold text-emerald-300">
+                  ฿{c.price.toLocaleString()}
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button onClick={goApply} className="rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-emerald-950 transition hover:bg-emerald-400">
+                  สมัครคอร์สนี้
+                </button>
+                <button className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-800">ดูรายละเอียด</button>
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function Apply() {
+  return (
+    <Section title="สมัครเรียน">
+      <Card className="p-5">
+        <p className="text-slate-300">
+          สร้าง <b>Google Form</b> ของคุณ แล้วนำลิงก์แบบฝัง (Embed) มาแทนที่ iframe ด้านล่างนี้ เพื่อเก็บข้อมูลผู้สมัครและแนบสลิปการชำระเงิน
+        </p>
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-800">
+          <iframe
+            title="Application Form"
+            className="h-[70vh] w-full"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSf-demo/viewform?embedded=true"
+          >
+            กำลังโหลด…
+          </iframe>
+        </div>
+        <div className="mt-4 text-sm text-slate-400">* เปลี่ยน URL ของ iframe เป็นฟอร์มจริงของคุณ</div>
+      </Card>
+    </Section>
+  );
+}
+
+function Payment() {
+  return (
+    <Section title="ชำระเงิน">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-5">
+          <h3 className="text-lg font-semibold text-slate-100">โอน / PromptPay</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-300">
+            <li>
+              <b>PromptPay:</b> 08x-xxx-xxxx <span className="text-slate-400">(ชื่อบัญชี สถาบันเรียนเสริม Demo)</span>
+            </li>
+            <li>
+              <b>ธนาคารกสิกรไทย:</b> 123-4-56789-0 <span className="text-slate-400">(ออมทรัพย์)</span>
+            </li>
+            <li>แนบสลิปใน Google Form เพื่อยืนยันการชำระเงิน</li>
+          </ul>
+        </Card>
+        <Card className="grid grid-cols-[120px_1fr] items-center gap-4 p-5">
+          <img
+            alt="PromptPay QR"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=PROMPTPAY-DEMO"
+            className="h-28 w-28 rounded-lg"
+          />
+          <div>
+            <div className="font-semibold text-slate-200">สแกนเพื่อชำระ (QR ตัวอย่าง)</div>
+            <p className="text-sm text-slate-400">อัปโหลด QR จริง แล้วเปลี่ยน src ของรูปเป็นไฟล์ของคุณ</p>
+          </div>
+        </Card>
+      </div>
+      <Card className="mt-4 p-5 text-sm text-slate-400">
+        * ถ้าต้องการรับบัตรเครดิต/ผ่อนชำระ ให้เชื่อม Omise/Stripe ในเวอร์ชันถัดไป (ต้องมี back-end หรือ serverless function)
+      </Card>
+    </Section>
+  );
+}
+
+function FAQ() {
+  const Q = [
+    { q: "ต้องเช่าโฮสติ้งไหม?", a: "ไม่จำเป็น ใช้ GitHub Pages ฟรี และใช้ Google Form เก็บข้อมูลผู้สมัครได้เลย" },
+    { q: "แนบสลิปได้ไหม?", a: "ได้ เปิดสิทธิ์อัปโหลดไฟล์ใน Google Form (ผู้สมัครต้องล็อกอิน Google) หรือให้ส่งสลิปผ่านไลน์/อีเมล" },
+    { q: "อยากรับบัตรเครดิต?", a: "ทำได้โดยเชื่อมเกตเวย์เช่น Omise/Stripe (มีค่าธรรมเนียม) และต้องพัฒนาเพิ่ม" },
+  ];
+  return (
+    <Section title="คำถามที่พบบ่อย (FAQ)">
+      <div className="space-y-3">
+        {Q.map((item, i) => (
+          <motion.details key={i} initial={false} className="group overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-4">
+            <summary className="cursor-pointer list-none font-semibold text-slate-100">
+              {item.q}
+            </summary>
+            <p className="mt-2 text-slate-300">{item.a}</p>
+          </motion.details>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function Contact() {
+  return (
+    <Section title="ติดต่อเรา">
+      <Card className="p-5">
+        <div className="grid gap-2 text-slate-300">
+          <div>ที่อยู่: 123 ถนนการศึกษา อำเภอเมือง จังหวัดตัวอย่าง 10000</div>
+          <div>โทร: 08x-xxx-xxxx | Line: @yourtutor</div>
+          <div>อีเมล: hello@yourdomain.com</div>
+        </div>
+      </Card>
+    </Section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="mx-auto mt-10 w-full max-w-6xl px-4 pb-8 text-center text-sm text-slate-500">
+      © {new Date().getFullYear()} สถาบันเรียนเสริม Demo — สร้างด้วย React + Tailwind + Framer Motion (โฮสต์บน GitHub Pages ได้)
+    </footer>
+  );
+}
+
+export default function App() {
+  const [route, setRoute] = useState("home");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => { setMenuOpen(false); }, [route]);
+
+  const go = (key) => () => setRoute(key);
+
+  const Page = () => {
+    switch (route) {
+      case "home":
+        return <Hero goApply={go("apply")} goCourses={go("courses")} />;
+      case "courses":
+        return <Courses goApply={go("apply")} />;
+      case "apply":
+        return <Apply />;
+      case "payment":
+        return <Payment />;
+      case "faq":
+        return <FAQ />;
+      case "contact":
+        return <Contact />;
+      default:
+        return <Hero goApply={go("apply")} goCourses={go("courses")} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* Topbar */}
+      <div className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-400 to-sky-400" />
+            <div className="text-sm font-bold tracking-wide text-slate-200">สถาบันเรียนเสริม Demo</div>
+          </div>
+          <nav className="hidden gap-1 md:flex">
+            {NAV.map((n) => (
+              <button
+                key={n.key}
+                onClick={go(n.key)}
+                className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${
+                  route === n.key ? "bg-slate-800 text-emerald-300" : "text-slate-300 hover:bg-slate-900"
+                }`}
+              >
+                <n.icon size={16} /> {n.label}
+              </button>
+            ))}
+          </nav>
+          <button className="md:hidden" onClick={() => setMenuOpen((v) => !v)}>
+            {menuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden"
+            >
+              <div className="mx-auto w-full max-w-6xl px-2 pb-2">
+                {NAV.map((n) => (
+                  <button
+                    key={n.key}
+                    onClick={go(n.key)}
+                    className={`mb-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm ${
+                      route === n.key ? "bg-slate-800 text-emerald-300" : "text-slate-300 hover:bg-slate-900"
+                    }`}
+                  >
+                    <n.icon size={16} /> {n.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Page container with animated transitions */}
+      <main className="pb-8">
+        <AnimatePresence mode="wait">
+          <motion.div key={route} variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <Page />
+          </motion.div>
+        </AnimatePresence>
+        <Footer />
+      </main>
     </div>
-  </section>
-
-  <section id="apply">
-    <h2>สมัครเรียน</h2>
-    <p>กรอกแบบฟอร์มสมัครเรียนออนไลน์ได้ที่นี่:</p>
-    <p><a href="https://forms.gle/" class="btn" target="_blank">เปิดแบบฟอร์มสมัคร</a></p>
-    <p>หรือฝัง Google Form ตรงนี้:</p>
-    <iframe src="https://docs.google.com/forms/d/e/example/viewform?embedded=true">กำลังโหลด…</iframe>
-  </section>
-
-  <section id="payment">
-    <h2>ชำระเงิน</h2>
-    <p>ชำระผ่าน PromptPay หรือโอนธนาคารได้ดังนี้:</p>
-    <ul>
-      <li>PromptPay: 08x-xxx-xxxx (ชื่อบัญชี สถาบันเรียนเสริม Demo)</li>
-      <li>ธนาคารกสิกรไทย: 123-4-56789-0</li>
-    </ul>
-    <p>แนบสลิปใน Google Form เพื่อยืนยันการชำระเงิน</p>
-  </section>
-
-  <section id="contact">
-    <h2>ติดต่อเรา</h2>
-    <p>ที่อยู่: 123 ถนนการศึกษา อำเภอเมือง จังหวัดตัวอย่าง 10000</p>
-    <p>โทร: 08x-xxx-xxxx</p>
-    <p>Line: @yourtutor</p>
-  </section>
-
-  <footer>
-    <p>© 2025 สถาบันเรียนเสริม Demo | ตัวอย่างเว็บไซต์ฟรีสำหรับ GitHub Pages</p>
-  </footer>
-</body>
-</html>
+  );
+}
