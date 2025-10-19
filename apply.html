@@ -5,39 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>สมัครเรียน | สถาบันเรียนเสริม</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <meta name="description" content="สมัครเรียนออนไลน์ กรอกฟอร์ม และอัปโหลดหลักฐานการชำระเงิน">
 </head>
 <body>
-  <nav class="nav"><div class="container nav-inner">
-    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
-    <div class="menu">
-      <a href="index.html">หน้าหลัก</a>
-      <a href="courses.html">คอร์ส</a>
-      <a href="apply.html" class="active">สมัครเรียน</a>
-      <a href="payment.html">ชำระเงิน</a>
-      <a href="status.html">สถานะการสมัคร</a>
-      <a href="contact.html">ติดต่อ</a>
+  <!-- Top Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+      <div class="menu">
+        <a href="index.html">หน้าหลัก</a>
+        <a href="courses.html">คอร์ส</a>
+        <a href="apply.html" class="active">สมัครเรียน</a>
+        <a href="payment.html">ชำระเงิน</a>
+        <a href="status.html">สถานะการสมัคร</a>
+        <a href="contact.html">ติดต่อ</a>
+      </div>
     </div>
-  </div></nav>
+  </nav>
 
-  <section class="section">
+  <!-- Apply Section -->
+  <section class="section" id="apply">
     <div class="container reveal">
       <h1>สมัครเรียน</h1>
-      <div class="card" style="padding:1rem">
-        <p class="muted">กรอก <b>Google Form</b> เพื่อใส่ข้อมูลสมัครเรียน</p>
-        <!-- <p class="muted">สร้าง <b>Google Form</b> ของคุณ แล้วนำลิงก์แบบฝัง (Embed) มาแทนที่ iframe ด้านล่างนี้ เพื่อเก็บข้อมูลผู้สมัครและแนบสลิปการชำระเงิน</p> -->
-        <div style="margin-top:1rem;border:1px dashed var(--border);border-radius:12px;overflow:hidden">
-          <!-- เปลี่ยน URL ของฟอร์มตามจริง -->
-          <iframe title="Application Form" style="width:100%;height:70vh;border:0"
-            src="https://forms.gle/EmCA1ApsxbmDbaMq5">กำลังโหลด…</iframe>
+
+      <div class="card" style="padding:1rem; margin-bottom:1rem">
+        <h3 style="margin:0 0 .6rem">คำชี้แจงก่อนสมัคร (Before You Apply)</h3>
+        <p class="muted" style="margin:.2rem 0">
+          1) กรอกฟอร์มสมัคร → 2) เปิดฟอร์มอัปโหลดสลิปในแท็บใหม่ → 3) ใช้ <b>Application ID เดียวกัน</b> ทั้งสองฟอร์ม<br/>
+          Fill in the application form, then open the upload form in a new tab and use the <b>same Application ID</b>.
+        </p>
+      </div>
+
+      <!-- STEP 0: Application ID -->
+      <div class="card" style="padding:1rem; margin-bottom:1rem">
+        <h3 style="margin-top:0">รหัสผู้สมัคร (Application ID)</h3>
+        <p class="muted" style="margin:.2rem 0 .8rem">
+          โปรดคัดลอก <b>Application ID</b> นี้ไปกรอกในฟอร์ม “สมัครเรียน” และ “อัปโหลดสลิป” เพื่อให้เจ้าหน้าที่จับคู่ข้อมูลได้<br/>
+          Please copy this <b>Application ID</b> into both forms so we can match your records.
+        </p>
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <input id="appId" class="kbd" style="font-size:1rem;padding:.4rem .6rem" readonly>
+          <button class="btn btn-primary" id="copyAppId">คัดลอก ID</button>
+          <span id="copyMsg" class="muted" style="font-size:.9rem;"></span>
         </div>
-        <p class="muted" style="margin-top:.6rem">* ข้อมูลทั้งหมดจำเก็บไว้ ไม่มีการเผยแพร่</p>
-        <!-- <p class="muted" style="margin-top:.6rem">* เปลี่ยน URL ของ iframe เป็นฟอร์มจริงของคุณ</p> -->
+        <p class="muted" style="margin-top:.6rem">* ระบบจะสร้าง ID ให้อัตโนมัติและเก็บในเครื่องของคุณชั่วคราว (localStorage)</p>
+      </div>
+
+      <div class="grid grid-2">
+        <!-- STEP 1 -->
+        <div class="card" style="padding:1rem">
+          <h3 style="margin-top:0">ขั้นตอนที่ 1: กรอกแบบฟอร์มสมัครเรียน</h3>
+          <p class="muted">
+            กรอกข้อมูลให้ครบถ้วน และอย่าลืมใส่ <b>Application ID</b> จากด้านซ้ายในช่องที่กำหนด<br/>
+            Fill in the form and include your <b>Application ID</b> in the designated field.
+          </p>
+          <div style="margin-top:1rem;border:1px dashed var(--border);border-radius:12px;overflow:hidden">
+            <iframe
+              title="Application Form"
+              style="width:100%;height:70vh;border:0"
+              src="https://docs.google.com/forms/d/e/1FAIpQLSfrhSmg_fmTmXV3Q7H8-w_rd1MZpLhetOLpIf-eerPnvhSxoQ/viewform?embedded=true">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="card" style="padding:1rem">
+          <h3 style="margin-top:0">ขั้นตอนที่ 2: อัปโหลดสลิป/หลักฐานการชำระเงิน</h3>
+          <ol style="line-height:1.8; margin-top:.4rem">
+            <li>ตรวจสอบให้แน่ใจว่าได้กรอก “Application ID” ไว้ในขั้นตอนที่ 1 แล้ว</li>
+            <li>กดปุ่มด้านล่างเพื่อเปิดฟอร์มอัปโหลด (จะเปิดในแท็บใหม่)</li>
+            <li>กรอก <b>Application ID</b> เดียวกันแล้วแนบสลิป</li>
+          </ol>
+
+          <a class="btn btn-primary" id="uploadBtn" target="_blank"
+             href="https://docs.google.com/forms/d/e/1FAIpQLSejHHcaBwM63Q-6RmCmBcO6q4zvwu7rW2vLWo4OZsrEZgp7IQ/viewform">
+            อัปโหลดสลิป/หลักฐานการชำระเงิน (Open Upload Form)
+          </a>
+
+          <p class="muted" style="margin-top:.6rem">
+            * ฟอร์มอัปโหลดไฟล์ของ Google จะไม่สามารถฝังในเว็บได้ แต่สามารถเปิดในแท็บใหม่ได้ตามปกติ
+          </p>
+        </div>
       </div>
     </div>
   </section>
 
   <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
   <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
-  <script src="assets/app.js"></script>
+
+  <!-- Application ID Generator -->
+  <script>
+  (function(){
+    const KEY = 'admission_app_id';
+    function genId(){
+      const d = new Date();
+      const pad = (n)=> String(n).padStart(2,'0');
+      const stamp = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+      const rnd = String(Math.floor(Math.random()*10000)).padStart(4,'0');
+      return `${stamp}-${rnd}`;
+    }
+    const input = document.getElementById('appId');
+    let id = localStorage.getItem(KEY) || genId();
+    localStorage.setItem(KEY, id);
+    input.value = id;
+
+    // copy to clipboard
+    const copyBtn = document.getElementById('copyAppId');
+    const copyMsg = document.getElementById('copyMsg');
+    copyBtn.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(input.value); copyMsg.textContent = 'คัดลอกแล้ว'; }
+      catch{ copyMsg.textContent = 'คัดลอกไม่สำเร็จ'; }
+      setTimeout(()=> copyMsg.textContent = '', 2000);
+    });
+
+    // Prefill into upload form
+    const ENTRY_KEY = 'entry.1948023377';
+    const uploadBtn = document.getElementById('uploadBtn');
+    try {
+      const url = new URL(uploadBtn.href);
+      url.searchParams.set('usp','pp_url');
+      url.searchParams.set(ENTRY_KEY, id);
+      uploadBtn.href = url.toString();
+    } catch (e) {}
+  })();
+  </script>
 </body>
 </html>
