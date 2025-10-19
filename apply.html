@@ -28,6 +28,7 @@
     <div class="container reveal">
       <h1>สมัครเรียน</h1>
 
+      <!-- Introduction -->
       <div class="card" style="padding:1rem; margin-bottom:1rem">
         <h3 style="margin:0 0 .6rem">คำชี้แจงก่อนสมัคร (Before You Apply)</h3>
         <p class="muted" style="margin:.2rem 0">
@@ -52,12 +53,12 @@
       </div>
 
       <div class="grid grid-2">
-        <!-- STEP 1 -->
+        <!-- STEP 1: ฟอร์มสมัคร -->
         <div class="card" style="padding:1rem">
           <h3 style="margin-top:0">ขั้นตอนที่ 1: กรอกแบบฟอร์มสมัครเรียน</h3>
           <p class="muted">
-            กรอกข้อมูลให้ครบถ้วน และอย่าลืมใส่ <b>Application ID</b> จากด้านซ้ายในช่องที่กำหนด<br/>
-            Fill in the form and include your <b>Application ID</b> in the designated field.
+            กรอกข้อมูลให้ครบถ้วน ระบบจะเติม <b>Application ID</b> ให้อัตโนมัติในช่องที่กำหนด<br/>
+            Fill in the form. The <b>Application ID</b> will be prefilled automatically.
           </p>
           <div style="margin-top:1rem;border:1px dashed var(--border);border-radius:12px;overflow:hidden">
             <iframe
@@ -68,13 +69,13 @@
           </div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2: ฟอร์มอัปโหลด -->
         <div class="card" style="padding:1rem">
           <h3 style="margin-top:0">ขั้นตอนที่ 2: อัปโหลดสลิป/หลักฐานการชำระเงิน</h3>
           <ol style="line-height:1.8; margin-top:.4rem">
             <li>ตรวจสอบให้แน่ใจว่าได้กรอก “Application ID” ไว้ในขั้นตอนที่ 1 แล้ว</li>
             <li>กดปุ่มด้านล่างเพื่อเปิดฟอร์มอัปโหลด (จะเปิดในแท็บใหม่)</li>
-            <li>กรอก <b>Application ID</b> เดียวกันแล้วแนบสลิป</li>
+            <li>ระบบจะเติม <b>Application ID</b> ให้อัตโนมัติในฟอร์มอัปโหลด</li>
           </ol>
 
           <a class="btn btn-primary" id="uploadBtn" target="_blank"
@@ -93,7 +94,7 @@
   <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
   <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
 
-  <!-- Application ID Generator -->
+  <!-- 💡 Script: Application ID & Prefill ระบบกรอกอัตโนมัติ -->
   <script>
   (function(){
     const KEY = 'admission_app_id';
@@ -104,12 +105,13 @@
       const rnd = String(Math.floor(Math.random()*10000)).padStart(4,'0');
       return `${stamp}-${rnd}`;
     }
+
     const input = document.getElementById('appId');
     let id = localStorage.getItem(KEY) || genId();
     localStorage.setItem(KEY, id);
     input.value = id;
 
-    // copy to clipboard
+    // คัดลอก ID
     const copyBtn = document.getElementById('copyAppId');
     const copyMsg = document.getElementById('copyMsg');
     copyBtn.addEventListener('click', async ()=>{
@@ -118,15 +120,27 @@
       setTimeout(()=> copyMsg.textContent = '', 2000);
     });
 
-    // Prefill into upload form
-    const ENTRY_KEY = 'entry.1948023377';
+    // ✅ พรีฟิล Application ID เข้า "ฟอร์มสมัคร"
+    const MAIN_ENTRY_KEY = 'entry.1573949612'; // จากฟอร์มสมัคร
+    try {
+      const iframe = document.querySelector('iframe[title="Application Form"]');
+      if (iframe) {
+        const url = new URL(iframe.src);
+        url.searchParams.set('usp', 'pp_url');
+        url.searchParams.set(MAIN_ENTRY_KEY, id);
+        iframe.src = url.toString();
+      }
+    } catch (e) { console.warn('Cannot prefill main form', e); }
+
+    // ✅ พรีฟิล Application ID เข้า "ฟอร์มอัปโหลด"
+    const UPLOAD_ENTRY_KEY = 'entry.1948023377'; // จากฟอร์มอัปโหลด
     const uploadBtn = document.getElementById('uploadBtn');
     try {
       const url = new URL(uploadBtn.href);
       url.searchParams.set('usp','pp_url');
-      url.searchParams.set(ENTRY_KEY, id);
+      url.searchParams.set(UPLOAD_ENTRY_KEY, id);
       uploadBtn.href = url.toString();
-    } catch (e) {}
+    } catch (e) { console.warn('Cannot prefill upload form', e); }
   })();
   </script>
 </body>
