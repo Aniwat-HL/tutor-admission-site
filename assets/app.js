@@ -33,8 +33,8 @@ async function loadStatusFromSheet(){
   const info = document.getElementById('status-info');
 
   // TODO: ใส่ค่า Sheet จริง
-  const SHEET_ID = 'YOUR_SHEET_ID';
-  const GID = '0';
+  const SHEET_ID = '2PACX-1vQh-7Ysrk4FdoKqSWKNgQ-S9cBRGDN47crK51I9LGmjJf0dW6R00BU6P3IsKA2fuCVLP16qLxwMJZgj';
+  const GID = '592123917';
   // ใช้ publish as CSV
   const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
