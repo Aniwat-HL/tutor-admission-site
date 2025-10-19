@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>คอร์สเรียน | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html" class="active">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>คอร์สเรียน</h1>
+      <div class="grid grid-2" style="margin-top:1rem">
+        <div class="card" style="padding:1rem">
+          <h3>คณิตศาสตร์พื้นฐาน (ม.1–ม.3)</h3>
+          <p class="muted">ทบทวนหลักการ + ตะลุยโจทย์ แบ่งระดับความยากเป็น Step</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿2,990</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>ฟิสิกส์สรุปเข้ม (ม.4–ม.6)</h3>
+          <p class="muted">สรุปสูตรสำคัญ + เทคนิคทำข้อสอบ เข้าใจง่าย พร้อมชีท</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿2,490</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>English for University</h3>
+          <p class="muted">Grammar, Writing, Speaking สำหรับเตรียมเข้ามหาลัย</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿3,200</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>Digital Skills – AI & Data</h3>
+          <p class="muted">พื้นฐานข้อมูล/AI สำหรับนักเรียนยุคใหม่ (โครงงาน)</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿3,500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
