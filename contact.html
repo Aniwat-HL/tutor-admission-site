@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ติดต่อเรา | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html" class="active">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>ติดต่อเรา</h1>
+      <div class="card" style="padding:1rem;display:grid;gap:.6rem">
+        <div>ที่อยู่: 123 ถนนการศึกษา อำเภอเมือง จังหวัดตัวอย่าง 10000</div>
+        <div>โทร: 08x-xxx-xxxx | Line: @yourtutor</div>
+        <div>อีเมล: hello@yourdomain.com</div>
+        <div style="height:320px;border:1px dashed var(--border);border-radius:12px;display:grid;place-items:center;color:var(--muted)">แปะแผนที่/รูปสถาบันที่นี่</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
