@@ -1,329 +1,570 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, CreditCard, Home, FileText, Phone, GraduationCap, ChevronRight, Menu, X } from "lucide-react";
+# --- FILE: assets/styles.css
+:root {
+  --brand: #0ea5e9;        /* ← เปลี่ยนเป็นสีประจำสถาบัน */
+  --brand-600: #0284c7;    /* โทนเข้มของแบรนด์ */
+  --ink: #0f172a;          /* ตัวอักษร */
+  --bg: #0b1220;           /* พื้นหลังหลัก */
+  --card: #0f172a;         /* พื้นหลังการ์ด */
+  --muted: #94a3b8;        /* ตัวอักษรจาง */
+  --border: #1f2937;       /* เส้นกั้น */
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial}
+img{max-width:100%;display:block}
+a{color:var(--brand);text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:0 1rem}
 
-// ✅ Single-file React SPA that works in ChatGPT canvas preview
-// - Tailwind CSS for styling (auto-available in this environment)
-// - Framer Motion for page transitions & micro-interactions
-// - Minimal client-side router using useState (no external router needed)
-// - Easy to export to Vite/CRA and deploy on GitHub Pages
+/* Topbar */
+.nav{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.8);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;gap:.6rem;align-items:center;font-weight:800;color:#e2e8f0}
+.brand img{width:28px;height:28px}
+.menu a{margin-left:1rem;color:#cbd5e1;opacity:.9;position:relative}
+.menu a:is(:hover,.active){opacity:1}
+.menu a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:3px;background:linear-gradient(90deg,var(--brand),#60a5fa);border-radius:2px}
 
-const NAV = [
-  { key: "home", label: "หน้าหลัก", icon: Home },
-  { key: "courses", label: "คอร์สเรียน", icon: BookOpen },
-  { key: "apply", label: "สมัครเรียน", icon: FileText },
-  { key: "payment", label: "ชำระเงิน", icon: CreditCard },
-  { key: "faq", label: "FAQ", icon: GraduationCap },
-  { key: "contact", label: "ติดต่อ", icon: Phone },
-];
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--border);background:#0b1220;padding:.7rem 1rem;border-radius:12px;color:#e5e7eb;cursor:pointer}
+.btn-primary{background:var(--brand);border-color:var(--brand-600);color:#001b0d;font-weight:800}
+.btn-primary:hover{background:var(--brand-600)}
+.btn-outline:hover{border-color:#334155}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0a0f1f;border:1px solid #1f2937;border-radius:8px;padding:.15rem .45rem}
 
-const pageVariants = {
-  initial: { opacity: 0, y: 12, filter: "blur(4px)" },
-  enter: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.35 } },
-  exit: { opacity: 0, y: -12, filter: "blur(4px)", transition: { duration: 0.25 } },
-};
+/* Sections & cards */
+.section{padding:48px 0;border-bottom:1px solid var(--border)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px}
+.grid{display:grid;gap:1rem}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+@media (max-width: 900px){.grid-2,.grid-3{grid-template-columns:1fr}}
 
-const Card = ({ className = "", children }) => (
-  <div className={`rounded-2xl border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-slate-950/30 ${className}`}>{children}</div>
-);
+/* Animations */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.reveal{animation:fadeInUp .45s ease both}
+.card:hover{transform:translateY(-2px);transition:transform .2s ease}
 
-const Section = ({ title, children, className = "" }) => (
-  <section className={`mx-auto w-full max-w-6xl px-4 ${className}`}>
-    {title && <h2 className="mb-4 text-xl font-semibold text-slate-200">{title}</h2>}
-    {children}
-  </section>
-);
+/* Page transition (no-build) */
+body{opacity:1;transition:opacity .25s ease}
+body.leaving{opacity:0}
 
-const Badge = ({ children }) => (
-  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-400/10 px-3 py-1 text-sm text-emerald-300">
-    {children}
-  </span>
-);
+.footer{padding:28px 0;color:#94a3b8}
 
-function Hero({ goApply, goCourses }) {
-  return (
-    <div className="relative overflow-clip">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_50%_40%,rgba(34,197,94,.20),rgba(2,6,23,0))]" />
-      <Section className="pt-12 pb-10">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="flex flex-col justify-center">
-            <Badge>เปิดรับสมัครรุ่นใหม่ – ที่นั่งจำกัด</Badge>
-            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-slate-50 md:text-5xl">
-              ยกระดับผลการเรียน ด้วยคอร์สเสริมที่ออกแบบมาเพื่อคุณ
-            </h1>
-            <p className="mt-3 max-w-prose text-slate-300">
-              คณิต วิทย์ อังกฤษ และทักษะดิจิทัล สอนสด/ออนไลน์ กลุ่มเล็ก เหมาะสำหรับ ม.ต้น–ม.ปลาย พร้อมระบบสมัครออนไลน์และชำระเงินได้ทันที
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <button onClick={goApply} className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-emerald-950 transition hover:bg-emerald-400">
-                สมัครเรียนทันที
-              </button>
-              <button onClick={goCourses} className="rounded-xl border border-slate-700 bg-slate-900 px-5 py-3 font-semibold text-slate-200 transition hover:bg-slate-800">
-                ดูคอร์สทั้งหมด
-              </button>
-            </div>
-            <p className="mt-3 text-sm text-slate-400">* เว็บไซต์สาธิต: ฟรี, โฮสต์บน GitHub Pages ได้</p>
-          </div>
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Card className="p-4">
-              <div className="grid gap-3 sm:grid-cols-3">
-                {[
-                  { t: "คณิตเข้ม ม.ต้น", h: "12 ครั้ง", p: "฿2,990" },
-                  { t: "Physics Crash ม.ปลาย", h: "8 ครั้ง", p: "฿2,490" },
-                  { t: "English for Uni", h: "10 ครั้ง", p: "฿3,200" },
-                ].map((c, i) => (
-                  <motion.div key={i} whileHover={{ y: -3 }} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                    <div className="text-slate-200">{c.t}</div>
-                    <div className="text-sm text-slate-400">{c.h}</div>
-                    <div className="mt-2 font-bold text-emerald-300">{c.p}</div>
-                    <button onClick={goApply} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">
-                      สมัครคอร์สนี้ <ChevronRight size={16} />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </Section>
+/* Tables */
+table{width:100%;border-collapse:collapse}
+th,td{padding:.7rem;border-bottom:1px solid var(--border);text-align:left}
+th{color:#cbd5e1;font-weight:700}
+.status-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .55rem;border-radius:999px;border:1px solid #263244}
+.status-pill.ok{background:#052e1d;border-color:#0a3f26;color:#9ef2c4}
+.status-pill.warn{background:#3a2a05;border-color:#583f08;color:#fde68a}
+.status-pill.danger{background:#3a0d0d;border-color:#5c1b1b;color:#fecaca}
+
+
+# --- FILE: assets/app.js
+// เปลี่ยนโลโก้และธีมได้จาก CSS variables และไฟล์ svg
+// Page fade-out before navigation
+(function(){
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a');
+    if(!a) return; 
+    const href = a.getAttribute('href');
+    if(!href || href.startsWith('#') || a.target==='_blank') return;
+    // internal link only
+    if(location.origin === new URL(href, location.href).origin){
+      e.preventDefault();
+      document.body.classList.add('leaving');
+      setTimeout(()=>{ location.href = href; }, 200);
+    }
+  });
+})();
+
+// Set active menu by pathname
+(function(){
+  const path = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.menu a').forEach(a=>{
+    const href = a.getAttribute('href');
+    if((path === 'index.html' && href === 'index.html') || path === href){
+      a.classList.add('active');
+    }
+  });
+})();
+
+// Google Sheet status (status.html)
+async function loadStatusFromSheet(){
+  const table = document.getElementById('status-table');
+  if(!table) return;
+  const tbody = table.querySelector('tbody');
+  const info = document.getElementById('status-info');
+
+  // TODO: ใส่ Sheet จริงของคุณ
+  const SHEET_ID = 'YOUR_SHEET_ID';
+  const GID = '0';
+  // แนะนำใช้ CSV publish: File > Share > Publish to the web > เลือกชีตนี้ แล้วใช้ output=csv
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+
+  try{
+    const res = await fetch(csvUrl, { cache: 'no-store' });
+    if(!res.ok) throw new Error('fetch failed');
+    const csv = await res.text();
+    const rows = parseCSV(csv);
+    // คาดหวังหัวตาราง: application_id, name, course, paid, status, updated_at
+    const header = rows.shift().map(h=>h.trim().toLowerCase());
+    const idx = {
+      id: header.indexOf('application_id'),
+      name: header.indexOf('name'),
+      course: header.indexOf('course'),
+      paid: header.indexOf('paid'),
+      status: header.indexOf('status'),
+      updated: header.indexOf('updated_at'),
+    };
+
+    tbody.innerHTML = '';
+    rows.forEach(r=>{
+      if(!r.length || !r[idx.id]) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><code>${escapeHtml(r[idx.id])}</code></td>
+        <td>${escapeHtml(r[idx.name]||'')}</td>
+        <td>${escapeHtml(r[idx.course]||'')}</td>
+        <td>${escapeHtml(r[idx.paid]||'')}</td>
+        <td>${statusPill((r[idx.status]||'').toLowerCase())}</td>
+        <td>${escapeHtml(r[idx.updated]||'')}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    info.textContent = 'อัปเดตอัตโนมัติจาก Google Sheet (อ่านอย่างเดียว)';
+  }catch(err){
+    console.error(err);
+    info.textContent = 'ไม่สามารถโหลดสถานะจาก Google Sheet ได้ กรุณาตรวจสอบการตั้งค่า Publish และ SHEET_ID/GID';
+  }
+}
+
+function statusPill(s){
+  if(s.includes('approved')||s.includes('confirmed')||s.includes('paid')) return `<span class="status-pill ok">✔ ยืนยันแล้ว</span>`;
+  if(s.includes('pending')||s.includes('review')) return `<span class="status-pill warn">⌛ รอตรวจสอบ</span>`;
+  if(s.includes('rejected')||s.includes('cancel')) return `<span class="status-pill danger">✖ ไม่ผ่าน</span>`;
+  return `<span class="status-pill">${escapeHtml(s||'-')}</span>`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",
+  ">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+}
+
+// Simple CSV parser (no quotes in quotes edge cases heavy – พอสำหรับ Google Sheet ปกติ)
+function parseCSV(text){
+  const rows = [];
+  let row = [], cell = '', inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    if(ch === '"'){
+      if(inQuotes && text[i+1]==='"'){ cell += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if(ch === ',' && !inQuotes){
+      row.push(cell); cell = '';
+    } else if((ch === '\n' || ch === '\r') && !inQuotes){
+      if(cell !== '' || row.length) { row.push(cell); rows.push(row); row = []; cell = ''; }
+    } else {
+      cell += ch;
+    }
+  }
+  if(cell !== '' || row.length) row.push(cell), rows.push(row);
+  return rows;
+}
+
+if(document.readyState !== 'loading') loadStatusFromSheet();
+else document.addEventListener('DOMContentLoaded', loadStatusFromSheet);
+
+
+# --- FILE: assets/logo.svg
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="80" height="80" rx="20" fill="url(#g)"/>
+  <path d="M30 36h36M30 48h36M30 60h24" stroke="#0b1220" stroke-width="6" stroke-linecap="round"/>
+</svg>
+
+
+# --- FILE: _partials/nav.html
+<nav class="nav">
+  <div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
     </div>
-  );
-}
+  </div>
+</nav>
 
-function Courses({ goApply }) {
-  const courses = useMemo(
-    () => [
-      { id: "m1", title: "คณิตศาสตร์พื้นฐาน (ม.1–ม.3)", desc: "ทบทวนหลักการ + ตะลุยโจทย์ แบ่งระดับความยากเป็น Step", price: 2990 },
-      { id: "p6", title: "ฟิสิกส์สรุปเข้ม (ม.4–ม.6)", desc: "สรุปสูตรสำคัญ + เทคนิคทำข้อสอบ เข้าใจง่าย พร้อมชีท", price: 2490 },
-      { id: "eU", title: "English for University", desc: "Grammar, Writing, Speaking สำหรับเตรียมเข้ามหาลัย", price: 3200 },
-      { id: "ds1", title: "Digital Skills – AI & Data", desc: "พื้นฐานข้อมูล/AI สำหรับนักเรียนยุคใหม่ (โครงงาน)", price: 3500 },
-    ],
-    []
-  );
-  return (
-    <Section title="คอร์สเรียน">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {courses.map((c, idx) => (
-          <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-            <Card className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-100">{c.title}</h3>
-                  <p className="mt-1 text-sm text-slate-400">{c.desc}</p>
-                </div>
-                <div className="rounded-lg border border-emerald-500/30 bg-emerald-400/10 px-3 py-1 font-bold text-emerald-300">
-                  ฿{c.price.toLocaleString()}
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button onClick={goApply} className="rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-emerald-950 transition hover:bg-emerald-400">
-                  สมัครคอร์สนี้
-                </button>
-                <button className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-800">ดูรายละเอียด</button>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+
+# --- FILE: _partials/footer.html
+<footer class="footer container">
+  © <span id="y"></span> สถาบันเรียนเสริม — ดีไซน์ด้วย HTML/CSS/JS (โฮสต์บน GitHub Pages)
+</footer>
+<script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+<script src="assets/app.js"></script>
+
+
+# --- FILE: index.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>หน้าหลัก | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+  <meta name="description" content="เว็บไซต์สถาบันเรียนเสริม สมัครเรียน ชำระเงิน ตรวจสถานะ — มืออาชีพ ใช้ได้ฟรีบน GitHub Pages"/>
+</head>
+<body>
+  <!-- include: _partials/nav.html -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+      <div class="menu">
+        <a href="index.html" class="active">หน้าหลัก</a>
+        <a href="courses.html">คอร์ส</a>
+        <a href="apply.html">สมัครเรียน</a>
+        <a href="payment.html">ชำระเงิน</a>
+        <a href="status.html">สถานะการสมัคร</a>
+        <a href="contact.html">ติดต่อ</a>
       </div>
-    </Section>
-  );
-}
+    </div>
+  </nav>
 
-function Apply() {
-  return (
-    <Section title="สมัครเรียน">
-      <Card className="p-5">
-        <p className="text-slate-300">
-          สร้าง <b>Google Form</b> ของคุณ แล้วนำลิงก์แบบฝัง (Embed) มาแทนที่ iframe ด้านล่างนี้ เพื่อเก็บข้อมูลผู้สมัครและแนบสลิปการชำระเงิน
-        </p>
-        <div className="mt-4 overflow-hidden rounded-xl border border-slate-800">
-          <iframe
-            title="Application Form"
-            className="h-[70vh] w-full"
-            src="https://docs.google.com/forms/d/e/1FAIpQLSf-demo/viewform?embedded=true"
-          >
-            กำลังโหลด…
-          </iframe>
+  <header class="container section reveal" style="padding-top:32px">
+    <div class="grid grid-2">
+      <div>
+        <span class="btn" style="background:#052e1d;border-color:#0a3f26;color:#9ef2c4">เปิดรับสมัครรุ่นใหม่ • ที่นั่งจำกัด</span>
+        <h1 style="font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.2;margin:.8rem 0">ยกระดับผลการเรียน ด้วยคอร์สเสริมที่ออกแบบมาเพื่อคุณ</h1>
+        <p style="color:var(--muted)">คณิต วิทย์ ภาษาอังกฤษ และทักษะดิจิทัล สอนสด/ออนไลน์ กลุ่มเล็ก เหมาะสำหรับ ม.ต้น–ม.ปลาย มีระบบสมัครออนไลน์และจ่ายเงินได้ทันที</p>
+        <div style="display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap">
+          <a class="btn btn-primary" href="apply.html">สมัครเรียนทันที</a>
+          <a class="btn btn-outline" href="courses.html">ดูคอร์สทั้งหมด</a>
         </div>
-        <div className="mt-4 text-sm text-slate-400">* เปลี่ยน URL ของ iframe เป็นฟอร์มจริงของคุณ</div>
-      </Card>
-    </Section>
-  );
-}
+      </div>
+      <div>
+        <div class="card" style="padding:1rem">
+          <h3 style="margin:0 0 .5rem">คอร์สยอดนิยม</h3>
+          <div class="grid grid-3">
+            <div class="card" style="padding:1rem">
+              <strong>คณิตเข้ม ม.ต้น</strong>
+              <div class="muted">12 ครั้ง / 18 ชม.</div>
+              <div style="color:#bbf7d0;font-weight:800">฿2,990</div>
+            </div>
+            <div class="card" style="padding:1rem">
+              <strong>Physics Crash</strong>
+              <div class="muted">8 ครั้ง / 12 ชม.</div>
+              <div style="color:#bbf7d0;font-weight:800">฿2,490</div>
+            </div>
+            <div class="card" style="padding:1rem">
+              <strong>English for Uni</strong>
+              <div class="muted">10 ครั้ง / 15 ชม.</div>
+              <div style="color:#bbf7d0;font-weight:800">฿3,200</div>
+            </div>
+          </div>
+          <p style="color:var(--muted);margin:.6rem 0 0">* ราคาตัวอย่าง แก้ในไฟล์ได้</p>
+        </div>
+      </div>
+    </div>
+  </header>
 
-function Payment() {
-  return (
-    <Section title="ชำระเงิน">
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="p-5">
-          <h3 className="text-lg font-semibold text-slate-100">โอน / PromptPay</h3>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-300">
-            <li>
-              <b>PromptPay:</b> 08x-xxx-xxxx <span className="text-slate-400">(ชื่อบัญชี สถาบันเรียนเสริม Demo)</span>
-            </li>
-            <li>
-              <b>ธนาคารกสิกรไทย:</b> 123-4-56789-0 <span className="text-slate-400">(ออมทรัพย์)</span>
-            </li>
+  <section class="section">
+    <div class="container reveal">
+      <h2>ทำไมต้องเรียนกับเรา</h2>
+      <div class="grid grid-3" style="margin-top:.6rem">
+        <div class="card" style="padding:1rem">ครูผู้สอนประสบการณ์สูง เนื้อหาตรงจุด</div>
+        <div class="card" style="padding:1rem">กลุ่มเล็ก ดูแลทั่วถึง สอบถามได้ตลอด</div>
+        <div class="card" style="padding:1rem">สมัคร/ชำระเงินออนไลน์ โปร่งใส ตรวจสถานะได้</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- include: _partials/footer.html -->
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — ดีไซน์ด้วย HTML/CSS/JS (โฮสต์บน GitHub Pages)</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
+
+# --- FILE: courses.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>คอร์สเรียน | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html" class="active">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>คอร์สเรียน</h1>
+      <div class="grid grid-2" style="margin-top:1rem">
+        <div class="card" style="padding:1rem">
+          <h3>คณิตศาสตร์พื้นฐาน (ม.1–ม.3)</h3>
+          <p class="muted">ทบทวนหลักการ + ตะลุยโจทย์ แบ่งระดับความยากเป็น Step</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿2,990</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>ฟิสิกส์สรุปเข้ม (ม.4–ม.6)</h3>
+          <p class="muted">สรุปสูตรสำคัญ + เทคนิคทำข้อสอบ เข้าใจง่าย พร้อมชีท</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿2,490</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>English for University</h3>
+          <p class="muted">Grammar, Writing, Speaking สำหรับเตรียมเข้ามหาลัย</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿3,200</span>
+          </div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <h3>Digital Skills – AI & Data</h3>
+          <p class="muted">พื้นฐานข้อมูล/AI สำหรับนักเรียนยุคใหม่ (โครงงาน)</p>
+          <div style="display:flex;gap:.6rem;margin-top:.6rem">
+            <a class="btn btn-primary" href="apply.html">สมัครคอร์สนี้</a>
+            <span class="btn" style="pointer-events:none">฿3,500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
+
+# --- FILE: apply.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สมัครเรียน | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html" class="active">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>สมัครเรียน</h1>
+      <div class="card" style="padding:1rem">
+        <p class="muted">สร้าง <b>Google Form</b> ของคุณ แล้วนำลิงก์แบบฝัง (Embed) มาแทนที่ iframe ด้านล่างนี้ เพื่อเก็บข้อมูลผู้สมัครและแนบสลิปการชำระเงิน</p>
+        <div style="margin-top:1rem;border:1px dashed var(--border);border-radius:12px;overflow:hidden">
+          <iframe title="Application Form" style="width:100%;height:70vh;border:0" src="https://docs.google.com/forms/d/e/1FAIpQLSf-demo/viewform?embedded=true">กำลังโหลด…</iframe>
+        </div>
+        <p class="muted" style="margin-top:.6rem">* เปลี่ยน URL ของ iframe เป็นฟอร์มจริงของคุณ</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
+
+# --- FILE: payment.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ชำระเงิน | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html" class="active">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>ชำระเงิน</h1>
+      <div class="grid grid-2">
+        <div class="card" style="padding:1rem">
+          <h3>ชำระผ่าน PromptPay / โอนธนาคาร</h3>
+          <ul style="line-height:1.8">
+            <li><strong>PromptPay:</strong> 08x-xxx-xxxx (ชื่อบัญชี “สถาบันเรียนเสริม”)</li>
+            <li><strong>ธนาคารกสิกรไทย:</strong> 123-4-56789-0 (ออมทรัพย์)</li>
             <li>แนบสลิปใน Google Form เพื่อยืนยันการชำระเงิน</li>
           </ul>
-        </Card>
-        <Card className="grid grid-cols-[120px_1fr] items-center gap-4 p-5">
-          <img
-            alt="PromptPay QR"
-            src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=PROMPTPAY-DEMO"
-            className="h-28 w-28 rounded-lg"
-          />
+        </div>
+        <div class="card" style="padding:1rem;display:grid;grid-template-columns:120px 1fr;gap:1rem;align-items:center">
+          <img alt="PromptPay QR" src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=PROMPTPAY-DEMO" width="120" height="120" style="border-radius:8px"/>
           <div>
-            <div className="font-semibold text-slate-200">สแกนเพื่อชำระ (QR ตัวอย่าง)</div>
-            <p className="text-sm text-slate-400">อัปโหลด QR จริง แล้วเปลี่ยน src ของรูปเป็นไฟล์ของคุณ</p>
+            <div style="font-weight:700">สแกนเพื่อชำระ (QR ตัวอย่าง)</div>
+            <p class="muted" style="margin:.3rem 0 0">อัปโหลดรูป QR จริงของคุณแทนที่ URL ข้างต้น</p>
           </div>
-        </Card>
-      </div>
-      <Card className="mt-4 p-5 text-sm text-slate-400">
-        * ถ้าต้องการรับบัตรเครดิต/ผ่อนชำระ ให้เชื่อม Omise/Stripe ในเวอร์ชันถัดไป (ต้องมี back-end หรือ serverless function)
-      </Card>
-    </Section>
-  );
-}
-
-function FAQ() {
-  const Q = [
-    { q: "ต้องเช่าโฮสติ้งไหม?", a: "ไม่จำเป็น ใช้ GitHub Pages ฟรี และใช้ Google Form เก็บข้อมูลผู้สมัครได้เลย" },
-    { q: "แนบสลิปได้ไหม?", a: "ได้ เปิดสิทธิ์อัปโหลดไฟล์ใน Google Form (ผู้สมัครต้องล็อกอิน Google) หรือให้ส่งสลิปผ่านไลน์/อีเมล" },
-    { q: "อยากรับบัตรเครดิต?", a: "ทำได้โดยเชื่อมเกตเวย์เช่น Omise/Stripe (มีค่าธรรมเนียม) และต้องพัฒนาเพิ่ม" },
-  ];
-  return (
-    <Section title="คำถามที่พบบ่อย (FAQ)">
-      <div className="space-y-3">
-        {Q.map((item, i) => (
-          <motion.details key={i} initial={false} className="group overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-4">
-            <summary className="cursor-pointer list-none font-semibold text-slate-100">
-              {item.q}
-            </summary>
-            <p className="mt-2 text-slate-300">{item.a}</p>
-          </motion.details>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function Contact() {
-  return (
-    <Section title="ติดต่อเรา">
-      <Card className="p-5">
-        <div className="grid gap-2 text-slate-300">
-          <div>ที่อยู่: 123 ถนนการศึกษา อำเภอเมือง จังหวัดตัวอย่าง 10000</div>
-          <div>โทร: 08x-xxx-xxxx | Line: @yourtutor</div>
-          <div>อีเมล: hello@yourdomain.com</div>
         </div>
-      </Card>
-    </Section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="mx-auto mt-10 w-full max-w-6xl px-4 pb-8 text-center text-sm text-slate-500">
-      © {new Date().getFullYear()} สถาบันเรียนเสริม Demo — สร้างด้วย React + Tailwind + Framer Motion (โฮสต์บน GitHub Pages ได้)
-    </footer>
-  );
-}
-
-export default function App() {
-  const [route, setRoute] = useState("home");
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => { setMenuOpen(false); }, [route]);
-
-  const go = (key) => () => setRoute(key);
-
-  const Page = () => {
-    switch (route) {
-      case "home":
-        return <Hero goApply={go("apply")} goCourses={go("courses")} />;
-      case "courses":
-        return <Courses goApply={go("apply")} />;
-      case "apply":
-        return <Apply />;
-      case "payment":
-        return <Payment />;
-      case "faq":
-        return <FAQ />;
-      case "contact":
-        return <Contact />;
-      default:
-        return <Hero goApply={go("apply")} goCourses={go("courses")} />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Topbar */}
-      <div className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-400 to-sky-400" />
-            <div className="text-sm font-bold tracking-wide text-slate-200">สถาบันเรียนเสริม Demo</div>
-          </div>
-          <nav className="hidden gap-1 md:flex">
-            {NAV.map((n) => (
-              <button
-                key={n.key}
-                onClick={go(n.key)}
-                className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${
-                  route === n.key ? "bg-slate-800 text-emerald-300" : "text-slate-300 hover:bg-slate-900"
-                }`}
-              >
-                <n.icon size={16} /> {n.label}
-              </button>
-            ))}
-          </nav>
-          <button className="md:hidden" onClick={() => setMenuOpen((v) => !v)}>
-            {menuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-        {/* Mobile menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden"
-            >
-              <div className="mx-auto w-full max-w-6xl px-2 pb-2">
-                {NAV.map((n) => (
-                  <button
-                    key={n.key}
-                    onClick={go(n.key)}
-                    className={`mb-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm ${
-                      route === n.key ? "bg-slate-800 text-emerald-300" : "text-slate-300 hover:bg-slate-900"
-                    }`}
-                  >
-                    <n.icon size={16} /> {n.label}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-
-      {/* Page container with animated transitions */}
-      <main className="pb-8">
-        <AnimatePresence mode="wait">
-          <motion.div key={route} variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <Page />
-          </motion.div>
-        </AnimatePresence>
-        <Footer />
-      </main>
+      <p class="muted" style="margin-top:.8rem">* ถ้าต้องการรับบัตรเครดิต แนะนำเชื่อม Omise/Stripe ในเวอร์ชันถัดไป</p>
     </div>
-  );
-}
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
+
+# --- FILE: status.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สถานะการสมัคร | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html" class="active">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>สถานะการสมัคร</h1>
+      <p class="muted">ระบบนี้อ่านข้อมูลจาก <strong>Google Sheet</strong> (โหมดสาธารณะ ดูอย่างเดียว) — กรอก Sheet แล้วกดรีเฟรชหน้านี้เพื่ออัปเดต</p>
+      <div class="card" style="padding:1rem;overflow:auto">
+        <table id="status-table">
+          <thead>
+            <tr>
+              <th>Application ID</th>
+              <th>ชื่อ</th>
+              <th>คอร์ส</th>
+              <th>การชำระเงิน</th>
+              <th>สถานะ</th>
+              <th>อัปเดตล่าสุด</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" style="color:var(--muted)">กำลังโหลด…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="status-info" class="muted" style="margin-top:.6rem">กำลังโหลด…</p>
+
+      <details style="margin-top:1rem" class="card">
+        <summary style="padding:1rem;cursor:pointer;font-weight:700">วิธีตั้งค่า Google Sheet (ครั้งแรก)</summary>
+        <div style="padding:1rem;line-height:1.8;color:#cbd5e1">
+          <ol>
+            <li>สร้าง Google Sheet หัวคอลัมน์: <code>application_id, name, course, paid, status, updated_at</code></li>
+            <li>ไปที่ <b>File → Share → Publish to the web</b> เลือกชีตที่ต้องการ แล้วกด Publish</li>
+            <li>คัดลอก <code>Sheet ID</code> (อยู่ใน URL หลัง <code>/d/</code>) และ <code>gid</code> ของชีตนั้น</li>
+            <li>เปิดไฟล์ <code>assets/app.js</code> แล้วแทนค่า <code>SHEET_ID</code> และ <code>GID</code></li>
+            <li>Commit & Push ไปที่ GitHub Pages จากนั้นรีเฟรชหน้านี้</li>
+          </ol>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
+
+
+# --- FILE: contact.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ติดต่อเรา | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html" class="active">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>ติดต่อเรา</h1>
+      <div class="card" style="padding:1rem;display:grid;gap:.6rem">
+        <div>ที่อยู่: 123 ถนนการศึกษา อำเภอเมือง จังหวัดตัวอย่าง 10000</div>
+        <div>โทร: 08x-xxx-xxxx | Line: @yourtutor</div>
+        <div>อีเมล: hello@yourdomain.com</div>
+        <div style="height:320px;border:1px dashed var(--border);border-radius:12px;display:grid;place-items:center;color:var(--muted)">แปะแผนที่/รูปสถาบันที่นี่</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
