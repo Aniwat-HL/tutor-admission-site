@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ชำระเงิน | สถาบันเรียนเสริม</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="Logo"/> <span>สถาบันเรียนเสริม</span></div>
+    <div class="menu">
+      <a href="index.html">หน้าหลัก</a>
+      <a href="courses.html">คอร์ส</a>
+      <a href="apply.html">สมัครเรียน</a>
+      <a href="payment.html" class="active">ชำระเงิน</a>
+      <a href="status.html">สถานะการสมัคร</a>
+      <a href="contact.html">ติดต่อ</a>
+    </div>
+  </div></nav>
+
+  <section class="section">
+    <div class="container reveal">
+      <h1>ชำระเงิน</h1>
+      <div class="grid grid-2">
+        <div class="card" style="padding:1rem">
+          <h3>ชำระผ่าน PromptPay / โอนธนาคาร</h3>
+          <ul style="line-height:1.8">
+            <li><strong>PromptPay:</strong> 08x-xxx-xxxx (ชื่อบัญชี “สถาบันเรียนเสริม”)</li>
+            <li><strong>ธนาคารกสิกรไทย:</strong> 123-4-56789-0 (ออมทรัพย์)</li>
+            <li>แนบสลิปใน Google Form เพื่อยืนยันการชำระเงิน</li>
+          </ul>
+        </div>
+        <div class="card" style="padding:1rem;display:grid;grid-template-columns:120px 1fr;gap:1rem;align-items:center">
+          <img alt="PromptPay QR"
+               src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=PROMPTPAY-DEMO"
+               width="120" height="120" style="border-radius:8px"/>
+          <div>
+            <div style="font-weight:700">สแกนเพื่อชำระ (QR ตัวอย่าง)</div>
+            <p class="muted" style="margin:.3rem 0 0">อัปโหลดรูป QR จริงของคุณแทนที่ URL ข้างต้น</p>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:.8rem">* ถ้าต้องการรับบัตรเครดิต แนะนำเชื่อม Omise/Stripe ในเวอร์ชันถัดไป</p>
+    </div>
+  </section>
+
+  <footer class="footer container">© <span id="y"></span> สถาบันเรียนเสริม — HTML/CSS/JS</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
