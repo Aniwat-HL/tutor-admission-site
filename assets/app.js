@@ -34,7 +34,7 @@ async function loadStatusFromSheet(){
 
   // ใส่ค่าจริงของคุณ
   const SHEET_ID = '2PACX-1vQh-7Ysrk4FdoKqSWKNgQ-S9cBRGDN47crK51I9LGmjJf0dW6R00BU6P3IsKA2fuCVLP16qLxwMJZgj';
-  const GID = '592123917'; // <— ใช้ gid ของแท็บที่ publish จริง
+  const GID = '2051869754'; // <— ใช้ gid ของแท็บที่ publish จริง
 
   // ใช้ URL ให้ตรงชนิดของ ID
   const csvUrl = SHEET_ID.startsWith('2PACX-')
