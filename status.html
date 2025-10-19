@@ -1,0 +1,63 @@
+// Google Sheet status (status.html)
+tbody.innerHTML = '';
+rows.forEach(r=>{
+if(!r.length || !r[idx.id]) return;
+const tr = document.createElement('tr');
+tr.innerHTML = `
+<td><code>${escapeHtml(r[idx.id])}</code></td>
+<td>${escapeHtml(r[idx.name]||'')}</td>
+<td>${escapeHtml(r[idx.course]||'')}</td>
+<td>${escapeHtml(r[idx.paid]||'')}</td>
+<td>${statusPill((r[idx.status]||'').toLowerCase())}</td>
+<td>${escapeHtml(r[idx.updated]||'')}</td>
+`;
+tbody.appendChild(tr);
+});
+
+
+info.textContent = 'อัปเดตอัตโนมัติจาก Google Sheet (อ่านอย่างเดียว)';
+}catch(err){
+console.error(err);
+info.textContent = 'ไม่สามารถโหลดสถานะจาก Google Sheet ได้ กรุณาตรวจสอบการตั้งค่า Publish และ SHEET_ID/GID';
+}
+}
+
+
+function statusPill(s){
+if(s.includes('approved')||s.includes('confirmed')||s.includes('paid')) return `<span class="status-pill ok">✔ ยืนยันแล้ว</span>`;
+if(s.includes('pending')||s.includes('review')) return `<span class="status-pill warn">⌛ รอตรวจสอบ</span>`;
+if(s.includes('rejected')||s.includes('cancel')) return `<span class="status-pill danger">✖ ไม่ผ่าน</span>`;
+return `<span class="status-pill">${escapeHtml(s||'-')}</span>`;
+}
+
+
+function escapeHtml(s){
+return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",
+">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+}
+
+
+// Simple CSV parser (no quotes in quotes edge cases heavy – พอสำหรับ Google Sheet ปกติ)
+function parseCSV(text){
+const rows = [];
+let row = [], cell = '', inQuotes = false;
+for(let i=0;i<text.length;i++){
+const ch = text[i];
+if(ch === '"'){
+if(inQuotes && text[i+1]==='"'){ cell += '"'; i++; }
+else inQuotes = !inQuotes;
+} else if(ch === ',' && !inQuotes){
+row.push(cell); cell = '';
+} else if((ch === '\n' || ch === '\r') && !inQuotes){
+if(cell !== '' || row.length) { row.push(cell); rows.push(row); row = []; cell = ''; }
+} else {
+cell += ch;
+}
+}
+if(cell !== '' || row.length) row.push(cell), rows.push(row);
+return rows;
+}
+
+
+if(document.readyState !== 'loading') loadStatusFromSheet();
+else document.addEventListener('DOMContentLoaded', loadStatusFromSheet);
