@@ -34,7 +34,7 @@ async function loadStatusFromSheet(){
 
   // TODO: ใส่ค่า Sheet จริง
   const SHEET_ID = '2PACX-1vQh-7Ysrk4FdoKqSWKNgQ-S9cBRGDN47crK51I9LGmjJf0dW6R00BU6P3IsKA2fuCVLP16qLxwMJZgj';
-  const GID = '592123917';
+  const GID = '2051869754';
   // ใช้ publish as CSV
   const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
